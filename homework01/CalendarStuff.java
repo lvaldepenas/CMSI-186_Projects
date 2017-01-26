@@ -17,10 +17,11 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *  Revision History
  *  ----------------
- *            Rev      Date     Modified by:  Reason for change/modification
- *           -----  ----------  ------------  -----------------------------------------------------------
- *  @version 1.0.0  2017-01-02  B.J. Johnson  Initial writing and release
- *           2.0.0  2017-01-25  Laura Valdepenas  Added isLeapYear, daysInMonth, isValidDate, and daysBetween code
+ *            Rev      Date     Modified by:      Reason for change/modification
+ *           -----  ----------  ------------      -------------------------------------------------------
+ *  @version 1.0.0  2017-01-02  B.J. Johnson      Initial writing and release
+ *           2.0.0  2017-01-25  Laura Valdepenas  isLeapYear, daysInMonth, dateEquals, compareDate,
+ *                                                isValidDate, and daysBetween methods added
  */
 public class CalendarStuff {
 
@@ -74,12 +75,10 @@ public class CalendarStuff {
        if ( year % 4 == 0 ) {
            if ( year % 100 == 0 ) {
                if ( year % 400 == 0 ) {
-                   return true;
+                 return true;
                } else { return false; }
            } else { return true; }
-       } else {
-           return false;
-       }
+       } else { return false; }
    }
 
   /**
@@ -87,7 +86,7 @@ public class CalendarStuff {
    * @param    month long containing month number, starting with "1" for "January"
    * @param    year  long containing four-digit year; required to handle Feb 29th
    * @return         long containing number of days in referenced month of the year
-   * notes: remember that the month variable is used as an index, and so must
+   * notes: remember that the month variable is used as an indix, and so must
    *         be decremented to make the appropriate index value
    */
    public static long daysInMonth( long month, long year ) {
@@ -113,7 +112,10 @@ public class CalendarStuff {
    * @return          boolean which is true if the two dates are exactly the same
    */
    public static boolean dateEquals( long month1, long day1, long year1, long month2, long day2, long year2 ) {
-      return true;
+       if ( month1 == month2 && day1 == day2 && year1 == year2 ) {
+           return true;
+       }
+       return false;
    }
 
   /**
@@ -127,7 +129,16 @@ public class CalendarStuff {
    * @return          int    -1/0/+1 if first date is less than/equal to/greater than second
    */
    public static int compareDate( long month1, long day1, long year1, long month2, long day2, long year2 ) {
-      return 0;
+       if ( year1 > year2 ) {
+           return 1;
+       } else if ( year1 == year2 && month1 > month2 ) {
+           return 1;
+       } else if ( year1 == year2 && month1 == month2 && day1 > day2 ) {
+           return 1;
+       } else if ( dateEquals( month1, day1, year1, month2, day2, year2 ) ) {
+           return 0;
+       }
+       return -1;
    }
 
   /**
@@ -140,14 +151,14 @@ public class CalendarStuff {
    *         be decremented to make the appropriate index value
    */
    public static boolean isValidDate( long month, long day, long year ) {
-       if ( month < 1 || month > 12 ) {
-           return false;
-       } else if ( day < 1 || day > daysInMonth(month, year) ) {
-           return false;
-       } else if ( year < 1 ) {
-           return false;
-       }
-       return true;
+     if ( month < 1 || month > 12 ) {
+         return false;
+     } else if ( day < 1 || day > daysInMonth(month, year) ) {
+         return false;
+     } else if ( year < 1 ) {
+         return false;
+     }
+     return true;
    }
 
   /**
@@ -172,36 +183,35 @@ public class CalendarStuff {
       }
    }
 
-   /**
-    * A method to return a count of the total number of days between two valid dates
-    * @param    month1 long   containing month number, starting with "1" for "January"
-    * @param    day1   long   containing day number
-    * @param    year1  long   containing four-digit year
-    * @param    month2 long   containing month number, starting with "1" for "January"
-    * @param    day2   long   containing day number
-    * @param    year2  long   containing four-digit year
-    * @return          long   count of total number of days
-    */
-    public static long daysBetween( long month1, long day1, long year1, long month2, long day2, long year2 ) {
-       long monthTracker = month1;
-       long yearTracker = year1;
-
+  /**
+   * A method to return a count of the total number of days between two valid dates
+   * @param    month1 long   containing month number, starting with "1" for "January"
+   * @param    day1   long   containing day number
+   * @param    year1  long   containing four-digit year
+   * @param    month2 long   containing month number, starting with "1" for "January"
+   * @param    day2   long   containing day number
+   * @param    year2  long   containing four-digit year
+   * @return          long   count of total number of days
+   */
+   public static long daysBetween( long month1, long day1, long year1, long month2, long day2, long year2 ) {
        long dayCount = 0;
 
-       for ( long dayTracker = day1; dayTracker != day2 || monthTracker != month2 || yearTracker != year2 ; dayTracker++ ) {
+       while ( ! dateEquals( month1, day1, year1, month2, day2, year2 ) ) {
            dayCount++;
+           day1++;
+           if ( day1 > daysInMonth(month1, year1) ) {
+               day1 = 1;
+               month1++;
+           }
 
-           if ( dayTracker >= daysInMonth(monthTracker, yearTracker) ) {
-               dayTracker = 1;
-               monthTracker++;
-
-               if ( monthTracker >= 12 ) {
-                   monthTracker = 1;
-                   yearTracker++;
-               }
+           if ( month1 > 12 ) {
+               year1++;
+               month1 = 1;
+               day1 = 1;
            }
        }
+
        return dayCount;
-    }
+   }
 
 }
