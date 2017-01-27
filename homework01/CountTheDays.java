@@ -11,34 +11,39 @@
  *  Warnings      :  None
  *  Exceptions    :  None
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Revision Histor
+ *  Revision History
  *  ---------------
  *            Rev      Date     Modified by:      Reason for change/modification
  *           -----  ----------  ------------      -------------------------------------------------------
  *  @version 1.0.0  2017-01-25  Laura Valdepenas  Initial writing and release
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
- 
 public class CountTheDays {
    public static void main( String args[] ) {
+
+      long month1 = Long.parseLong( args[0] );
+      long day1 = Long.parseLong( args[1] );
+      long year1 = Long.parseLong( args[2] );
+      long month2 = Long.parseLong( args[3] );
+      long day2 = Long.parseLong( args[4] );
+      long year2 = Long.parseLong( args[5] );
 
        if( args.length == 0 ) {
            System.out.println( "\n  Error! Enter something on the command line\n" );
        } else if ( args.length < 6 || args.length > 6 ) {
            System.out.println( "\n  Error! You entered an incorrect number of arguments\n" );
        } else {
-             if ( ! CalendarStuff.isValidDate( Long.parseLong( args[0] ), Long.parseLong( args[1] ), Long.parseLong( args[2] ) ) ) {
+             if ( ! CalendarStuff.isValidDate( month1, day1, year1 ) ) {
                  System.out.println( "\n  Invalid date! Please enter a valid first date on command line\n" );
-             } else if ( ! CalendarStuff.isValidDate( Long.parseLong( args[3] ), Long.parseLong( args[4] ), Long.parseLong( args[5] ) ) ) {
+             } else if ( ! CalendarStuff.isValidDate( month2, day2, year2 ) ) {
                  System.out.println( "\n  Invalid date! Please enter a valid second date on command line\n" );
-             } else if ( 1 == CalendarStuff.compareDate( Long.parseLong( args[0] ), Long.parseLong( args[1] ), Long.parseLong( args[2] ), Long.parseLong( args[3] ), Long.parseLong( args[4] ), Long.parseLong( args[5] ) ) ) {
-                 System.out.println( "\n Wrong order! First date is greater than second date\n " );
-             } else if ( CalendarStuff.dateEquals( Long.parseLong( args[0] ), Long.parseLong( args[1] ), Long.parseLong( args[2] ), Long.parseLong( args[3] ), Long.parseLong( args[4] ), Long.parseLong( args[5] ) ) ) {
-                 System.out.println( "\n You entered the same date! " );
+             } else {
+                 if ( CalendarStuff.dateEquals( month1, day1, year1, month2, day2, year2 ) ) {
+                     System.out.println( "\n You entered the same date!" );
+                 }
+                 long daysDifference = CalendarStuff.daysBetween( month1, day1, year1, month2, day2, year2 );
+                 System.out.println( "\n " + daysDifference + " days between " + args[0] + " " + args[1] + " " + args[2] + " and " + args[3] + " " + args[4] + " " + args[5] + "\n" );
              }
-
-             long daysDifference = CalendarStuff.daysBetween( Long.parseLong( args[0] ), Long.parseLong( args[1] ), Long.parseLong( args[2] ), Long.parseLong( args[3] ), Long.parseLong( args[4] ), Long.parseLong( args[5] ) );
-             System.out.println( "\n " + daysDifference + " days between " + args[0] + " " + args[1] + " " + args[2] + " and " + args[3] + " " + args[4] + " " + args[5] + "\n" );
        }
-   
+
    }
 }
