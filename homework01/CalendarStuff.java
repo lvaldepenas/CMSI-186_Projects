@@ -167,7 +167,7 @@ public class CalendarStuff {
    * @return         String containing the string value of the month (no spaces)
    */
    public static String toMonthString( int month ) {
-      switch( month - 1 ) {
+      switch( month - 1) {
          default: throw new IllegalArgumentException( "Illegal month value given to 'toMonthString()'." );
       }
    }
@@ -179,7 +179,7 @@ public class CalendarStuff {
    */
    public static String toDayOfWeekString( int day ) {
       switch( day - 1 ) {
-         default       : throw new IllegalArgumentException( "Illegal day value given to 'toDayOfWeekString()'." );
+         default: throw new IllegalArgumentException( "Illegal day value given to 'toDayOfWeekString()'." );
       }
    }
 
@@ -195,6 +195,21 @@ public class CalendarStuff {
    */
    public static long daysBetween( long month1, long day1, long year1, long month2, long day2, long year2 ) {
        long dayCount = 0;
+       long tempM;
+       long tempD;
+       long tempY;
+
+       if ( 1 == CalendarStuff.compareDate( month1, day1, year1, month2, day2, year2 ) ) {
+         tempM = month1;
+         month1 = month2;
+         month2 = tempM;
+         tempD = day1;
+         day1 = day2;
+         day2 = tempD;
+         tempY = year1;
+         year1 = year2;
+         year2 = tempY;
+       }
 
        while ( ! dateEquals( month1, day1, year1, month2, day2, year2 ) ) {
            dayCount++;
