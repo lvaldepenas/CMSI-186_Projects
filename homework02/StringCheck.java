@@ -23,20 +23,18 @@ public class StringCheck {
   public static void main( String[] args ) {
 
     System.out.println( "\n Welcome to the String Thing Checker! \n    Use any one of the following methods on any string \n" );
-    System.out.println( "       \u2022 vowels \n       \u2022 palindrome \n       \u2022 evenLetters \n       \u2022 oddLetters" );
-    System.out.println( "       \u2022 evensNoDupes \n       \u2022 oddsNoDupes \n       \u2022 reverse" );
+    System.out.println( "     \u2022 vowels \n     \u2022 palindrome \n     \u2022 evenLetters \n     \u2022 oddLetters" );
+    System.out.println( "     \u2022 evensNoDupes \n     \u2022 oddsNoDupes \n     \u2022 reverse" );
 
 
-    // Concatenates the input arguments if it is more than one word
+    // Concatenates the input arguments if it is more than one word, but removes spaces
     int n = args.length;
     String input = new String ( "" );
 
-    if(args.length > 1) {
+    if( args.length > 1 ) {
       for( int i = 1; i < n; i++ ){
-        input = input.concat( " " + args[i] );
+        input = input.concat( args[i] );
       }
-    } else {
-      input = args[1];
     }
 
 
