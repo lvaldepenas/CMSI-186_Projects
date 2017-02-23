@@ -35,7 +35,7 @@ public class HighRoll{
       while( true ) {
         System.out.println( " OPTION 0: create a new dice set");
         System.out.println( " OPTION 1: roll all the dice" );
-        System.out.println( " OPTION 2: roll an individual die" );
+        System.out.println( " OPTION 2: roll an individual die (input as 2.1 meaning die 1)" );
         System.out.println( " OPTION 3: calculate the score for this set" );
         System.out.println( " OPTION 4: save the score of this set as your high score" );
         System.out.println( " OPTION 5: display your current high score" );
@@ -45,30 +45,33 @@ public class HighRoll{
         String inputLine = null;
         try {
           inputLine = input.readLine();
+          String inputString = String.valueOf( inputLine );
+          String[] inputs = inputString.split( "." );
           if( 0 == inputLine.length() ) {
              System.out.println( "Enter one of the options\n" );
           } else if ( inputLine.charAt(0) != '1' && inputLine.charAt(0) != '2' && inputLine.charAt(0) != '3' && inputLine.charAt(0) != '4' && inputLine.charAt(0) != '5' && inputLine.charAt(0) != 'q') {
             System.out.println( "Enter a valid option\n" );
           }
 
-          if( '1' == inputLine.charAt(0) ) {
+          if( "1" == inputs[0] ) {
             set.roll();
             System.out.println( "Rolling....\n" + set.toString() + "\n" );
 
-          } else if( '2' == inputLine.charAt(0) ) {
-            System.out.println( "ENTER WHICH DIE YOU WANT TO ROLL:\n" );
-
-          } else if( '3' == inputLine.charAt(0) ) {
+          } else if( "2" == inputs[0] ) {
+            // something that allows the user to input which die to roll
+            set.rollIndividual( Integer.parseInt( inputs[1] ) );
+            System.out.println( "Rolling....\n" + set.toString() + "\n" );
+          } else if( "3" == inputs[0] ) {
             System.out.println( "DICE SUM: " + set.sum() + "\n" );
 
-          } else if( '4' == inputLine.charAt(0) ) {
+          } else if( "3" == inputs[0] ) {
             highScore = set.sum();
             System.out.println( "SCORE SAVED!!" + "\n" );
 
-          } else if( '5' == inputLine.charAt(0) ) {
+          } else if( "5" == inputs[0] ) {
             System.out.println( "HIGH SCORE: " + highScore + "\n" );
 
-          } else if( 'q' == inputLine.charAt(0) ) {
+          } else if( "q" == inputs[0] ) {
             break;
 
           }
