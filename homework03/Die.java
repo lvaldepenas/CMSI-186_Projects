@@ -32,7 +32,7 @@
  *           -----  ----------  ------------    -------------------------------------------------------
  *  @version 1.0.0  2017-02-06  B.J. Johnson    Initial writing and release
  *  @version 1.1.0  2017-02-17  B.J. Johnson    Filled in method code
- *  @version 2.0.0  2017-02-20 Laura Valdepenas Method codes complelted
+ *  @version 2.0.0  2017-02-20 Laura Valdepenas Method codes completed
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 public class Die {
 
@@ -112,11 +112,15 @@ public class Die {
    * A little test main to check things out
    */
    public static void main( String[] args ) {
-      System.out.println( "\n Hello from the Die class main method! \n" );
+      System.out.println( "\n Hello from the Die class main method!\n Enter a number of sides in the command line\n" );
 
       if ( args.length > 0 ) {
         int sideInput = Integer.parseInt( args[0] );
         Die d = new Die( sideInput );
+        Die d2 = new Die( 5 );
+        Die d3 = new Die( 8 );
+        Die d4 = new Die( 12 );
+        Die d5 = new Die( 7 );
 
         if ( sideInput < 4 ) {
            System.out.println( "" );
@@ -128,7 +132,39 @@ public class Die {
         System.out.println( "   Test for d.roll(): " + d.toString() );
         d.setSides(6);
         System.out.println( "   Test for d.setSides(6): " + d.toString() );
-        System.out.println( "   The pip count is " + d.getValue() );
+        System.out.println( "   The pip count is " + d.getValue() + "\n" );
+
+
+        System.out.println( " Testing a die with 5 sides:" );
+        d2.roll();
+        System.out.println( "   Test for d2.roll(): " + d2.toString() );
+        d2.setSides(6);
+        System.out.println( "   Test for d.setSides(6): " + d2.toString() );
+        System.out.println( "   The pip count is " + d2.getValue() + "\n" );
+
+
+        System.out.println( " Testing a die with 8 sides:" );
+        d3.roll();
+        System.out.println( "   Test for d3.roll(): " + d3.toString() );
+        d3.setSides(6);
+        System.out.println( "   Test for d3.setSides(6): " + d3.toString() );
+        System.out.println( "   The pip count is " + d3.getValue() + "\n" );
+
+
+        System.out.println( " Testing a die with 12 sides:" );
+        d4.roll();
+        System.out.println( "   Test for d4.roll(): " + d4.toString() );
+        d4.setSides(6);
+        System.out.println( "   Test for d4.setSides(6): " + d4.toString() );
+        System.out.println( "   The pip count is " + d4.getValue() + "\n" );
+
+
+        System.out.println( " Testing a die with 7 sides:" );
+        d5.roll();
+        System.out.println( "   Test for d5.roll(): " + d5.toString() );
+        d5.setSides(6);
+        System.out.println( "   Test for d5.setSides(6): " + d5.toString() );
+        System.out.println( "   The pip count is " + d5.getValue() + "\n" );
       }
     }
 
