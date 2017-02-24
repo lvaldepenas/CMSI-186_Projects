@@ -27,15 +27,14 @@ public class HighRoll{
    public static void main( String args[] ) {
       System.out.println( "\n   Welcome to High Roll!\n\n  Choose an option below:\n" );
 
-      DiceSet set = new DiceSet( 3, 6 );
       int highScore = 0;
-
+      DiceSet set = null;
 
       BufferedReader input = new BufferedReader( new InputStreamReader( System.in ) );
       while( true ) {
         System.out.println( " OPTION 0: create a new dice set");
         System.out.println( " OPTION 1: roll all the dice" );
-        System.out.println( " OPTION 2: roll an individual die (input as 2.1 meaning die 1)" );
+        System.out.println( " OPTION 2: roll an individual die (input as 2.0 meaning die 1)" );
         System.out.println( " OPTION 3: calculate the score for this set" );
         System.out.println( " OPTION 4: save the score of this set as your high score" );
         System.out.println( " OPTION 5: display your current high score" );
@@ -45,33 +44,40 @@ public class HighRoll{
         String inputLine = null;
         try {
           inputLine = input.readLine();
-          String inputString = String.valueOf( inputLine );
-          String[] inputs = inputString.split( "." );
           if( 0 == inputLine.length() ) {
              System.out.println( "Enter one of the options\n" );
-          } else if ( inputLine.charAt(0) != '1' && inputLine.charAt(0) != '2' && inputLine.charAt(0) != '3' && inputLine.charAt(0) != '4' && inputLine.charAt(0) != '5' && inputLine.charAt(0) != 'q') {
+          } else if ( inputLine.charAt(0) != '0' && inputLine.charAt(0) != '1' && inputLine.charAt(0) != '2' && inputLine.charAt(0) != '3' && inputLine.charAt(0) != '4' && inputLine.charAt(0) != '5' && inputLine.charAt(0) != 'q') {
             System.out.println( "Enter a valid option\n" );
           }
 
-          if( "1" == inputs[0] ) {
+          if( '0' == inputLine.charAt(0) ) {
+            System.out.println( "Enter count.sides where count is number of die and sides is number of sides for each dice\n" );
+            inputLine = input.readLine();
+            int count = Integer.parseInt( inputLine.substring(0, 1) );
+            int sides = Integer.parseInt( inputLine.substring(2, inputLine.length() ));
+            set = new DiceSet( count, sides );
+            System.out.println( set.toString() + "\n" );
+
+          } else if( '1' == inputLine.charAt(0) ) {
             set.roll();
             System.out.println( "Rolling....\n" + set.toString() + "\n" );
 
-          } else if( "2" == inputs[0] ) {
-            // something that allows the user to input which die to roll
-            set.rollIndividual( Integer.parseInt( inputs[1] ) );
+          } else if( '2' == inputLine.charAt(0) ) {
+            int dieIndex = Integer.parseInt( inputLine.substring(2, inputLine.length() ) );
+            set.rollIndividual( dieIndex );
             System.out.println( "Rolling....\n" + set.toString() + "\n" );
-          } else if( "3" == inputs[0] ) {
+
+          } else if( '3' == inputLine.charAt(0) ) {
             System.out.println( "DICE SUM: " + set.sum() + "\n" );
 
-          } else if( "3" == inputs[0] ) {
+          } else if( '4' == inputLine.charAt(0) ) {
             highScore = set.sum();
             System.out.println( "SCORE SAVED!!" + "\n" );
 
-          } else if( "5" == inputs[0] ) {
+          } else if( '5' == inputLine.charAt(0) ) {
             System.out.println( "HIGH SCORE: " + highScore + "\n" );
 
-          } else if( "q" == inputs[0] ) {
+          } else if( 'q' == inputLine.charAt(0) ) {
             break;
 
           }
@@ -79,6 +85,7 @@ public class HighRoll{
         catch( IOException ioe ) {
           System.out.println( "Caught IOException" );
         }
+
       }
    }
 }
