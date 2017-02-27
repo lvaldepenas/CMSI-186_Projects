@@ -81,18 +81,24 @@ public class DiceSet {
    * Randomly rolls a single die of the dice in this set indexed by 'dieIndex'
    * @param  dieIndex int of which die to roll
    * @return the integer value of the newly rolled die
-   * @trhows IllegalArgumentException if the index is out of range
+   * @throws IllegalArgumentException if the index is out of range
    */
    public int rollIndividual( int dieIndex ) {
+      if (dieIndex > ds.length) {
+        throw new IllegalArgumentException( "Index out of dice set range" );
+      }
       return ds[dieIndex].roll();
    }
 
   /**
    * Gets the value of the die in this set indexed by 'dieIndex'
    * @param  dieIndex int of which die to roll
-   * @trhows IllegalArgumentException if the index is out of range
+   * @throws IllegalArgumentException if the index is out of range
    */
    public int getIndividual( int dieIndex ) {
+      if (dieIndex > ds.length) {
+        throw new IllegalArgumentException( "Index out of dice set range" );
+      }
       return ds[dieIndex].getValue();
    }
 
@@ -121,14 +127,22 @@ public class DiceSet {
   /**
    * @return  true iff this set is identical to the set passed as an argument
    */
-   public boolean isIdentical( DiceSet ds ) {
-      return true;
+   public boolean isIdentical( DiceSet ds2 ) {
+      if( ds2.ds.length == ds.length ) {
+        return true;
+      }
+      return false;
    }
+
   /**
    * A little test main to check things out
    */
    public static void main( String[] args ) {
-      System.out.println( "\n Hello from the Dice Set class main method! \n" );
+      System.out.println( "\n Hello from the Dice Set class main method!\n Enter a number for the dice in the set and number of sides in the command line\n" );
+
+      DiceSet ds3 = new DiceSet(7, 6);
+      DiceSet ds4 = new DiceSet(3, 6);
+      DiceSet ds5 = new DiceSet(7, 8);
 
       if ( args.length > 0 ) {
         int k = Integer.parseInt( args[0] );
@@ -142,6 +156,10 @@ public class DiceSet {
         ds.rollIndividual(0);
         System.out.println( " Test for ds.rollIndividual(0):  " + ds.toString() );
         System.out.println( " Test for ds.sum():  " + ds.sum() );
+
+        System.out.println( " Test for ds.isIdentical(new DiceSet(7, 6)): " + ds.isIdentical(ds3));
+        System.out.println( " Test for ds.isIdentical(new DiceSet(3, 6)): " + ds.isIdentical(ds4));
+        System.out.println( " Test for ds.isIdentical(new DiceSet(7, 8)): " + ds.isIdentical(ds5));
       }
    }
 
