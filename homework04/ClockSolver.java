@@ -2,11 +2,13 @@
  *  File name     :  ClockSolver.java
  *  Purpose       :  The main program for the ClockSolver class
  *  @see
- *  @author       :  B.J. Johnson
+ *  @author       :  Laura Valdepenas
  *  Date written  :  2017-02-28
  *  Description   :  This class provides a bunch of methods which may be useful for the ClockSolver class
  *                   for Homework 4, part 1.  Includes the following:
-  *
+ *                   public ClockSolver();                      // Constructor for the file
+ *                   public void handleInitialArguments( String args[] )      // Handles and verifies args
+ *                   public static void main( String args[] )  // Main program to get time at certain angle with given time increments
  *  Notes         :  None right now.  I'll add some as they occur.
  *  Warnings      :  None
  *  Exceptions    :  IllegalArgumentException when the input arguments are "hinky"
@@ -16,6 +18,7 @@
  *            Rev      Date     Modified by:  Reason for change/modification
  *           -----  ----------  ------------  -----------------------------------------------------------
  *  @version 1.0.0  2017-02-28  B.J. Johnson  Initial writing and release
+ *  @version 2.0.0  2017-03-15  Laura Valdepenas  Completed methods and main program test
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 public class ClockSolver {
@@ -25,7 +28,7 @@ public class ClockSolver {
    private static final double MAX_TIME_SLICE_IN_SECONDS  = 1800.00;
    private static final double DEFAULT_TIME_SLICE_SECONDS = 60.0;
    private static final double EPSILON_VALUE              = 0.1;      // small value for double-precision comparisons
-   private static final double TARGET_WINDOW = 5.0;
+   private static final double TARGET_WINDOW = 7.0;
 
   /**
    *  Constructor
@@ -81,7 +84,7 @@ public class ClockSolver {
 
       while( true ) {
         if( args.length < 2 ) {
-          if( clock.tick( 60 ) > 43200 ) {
+          if( clock.tick( 60.0 ) > 43201 ) {
             break;
           }
           if( Math.abs( clock.getHandAngle() - targetAngle ) < TARGET_WINDOW ) {
@@ -89,7 +92,11 @@ public class ClockSolver {
           }
 
         } else if( args.length == 2) {
-          if ( clock.tick( Double.parseDouble( args[1] ) ) > 43200 ) {
+          if ( -1.0 == clock.validateTimeSliceArg( args[1]) ) {
+            System.out.println( "Invalid time slice" );
+            break;
+          }
+          if ( clock.tick( Double.parseDouble( args[1] ) ) > 43201 ) {
             break;
           }
           if ( Math.abs( clock.getHandAngle() - targetAngle ) < TARGET_WINDOW ) {
