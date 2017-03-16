@@ -28,7 +28,7 @@ public class ClockSolver {
    private static final double MAX_TIME_SLICE_IN_SECONDS  = 1800.00;
    private static final double DEFAULT_TIME_SLICE_SECONDS = 60.0;
    private static final double EPSILON_VALUE              = 0.1;      // small value for double-precision comparisons
-   private static final double TARGET_WINDOW = 7.0;
+   private static double TARGET_WINDOW = 6.0;
 
   /**
    *  Constructor
@@ -87,6 +87,9 @@ public class ClockSolver {
           if( clock.tick( 60.0 ) > 43201 ) {
             break;
           }
+          if( targetAngle > 90 ) {
+            TARGET_WINDOW = 20.0;
+          }
           if( Math.abs( clock.getHandAngle() - targetAngle ) < TARGET_WINDOW ) {
             System.out.println( clock.toString() );
           }
@@ -98,6 +101,12 @@ public class ClockSolver {
           }
           if ( clock.tick( Double.parseDouble( args[1] ) ) > 43201 ) {
             break;
+          }
+          if( targetAngle / Double.parseDouble( args[1] ) < 0.25) {
+            TARGET_WINDOW = 20.0;
+          }
+          if( targetAngle / Double.parseDouble( args[1] ) <= 0.5 && targetAngle / Double.parseDouble( args[1] ) >= 0.25) {
+            TARGET_WINDOW = 8.0;
           }
           if ( Math.abs( clock.getHandAngle() - targetAngle ) < TARGET_WINDOW ) {
             System.out.println( clock.toString() );
