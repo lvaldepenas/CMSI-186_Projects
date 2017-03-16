@@ -145,13 +145,23 @@ public class Clock {
 
      if( minAngle > hrAngle && minAngle > 180 ) {
        angle = (360 - minAngle) + hrAngle;
+       if( angle > 180 ) {
+         angle = 360 - angle;
+       }
      } else if( hrAngle > minAngle && hrAngle > 180 ) {
        angle = (360 - hrAngle) + minAngle;
+       if( angle > 180 ) {
+         angle = 360 - angle;
+       }
      } else if( minAngle > hrAngle && minAngle <= 180 ) {
        angle = minAngle - hrAngle;
      } else if( hrAngle > minAngle && hrAngle <= 180 ) {
        angle = hrAngle - minAngle;
-     } else if ( Math.abs( hrAngle - minAngle ) < 0) {
+     } else if( hrAngle > minAngle && minAngle <= 180) {
+       angle = hrAngle - minAngle;
+     }  else if( minAngle > hrAngle && hrAngle <= 180) {
+       angle = minAngle - hrAngle;
+     } else if ( Math.abs( minAngle - hrAngle ) < 0) {
        angle = 0;
      }
      return angle;
