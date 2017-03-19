@@ -76,13 +76,11 @@ public class Clock {
    *  @return  double-precision value of the argument
    *  @throws  NumberFormatException
    */
-   public double validateAngleArg( String argValue ) throws NumberFormatException {
+   public double validateAngleArg( String argValue ) throws NumberFormatException, IllegalArgumentException{
      double doubleAngle = Double.parseDouble( argValue );
 
-     if( doubleAngle > MAXIMUM_DEGREE_VALUE ) {
-        return doubleAngle - 360;
-     } else if( doubleAngle < 0 ) {
-        return doubleAngle + 360;
+     if( doubleAngle > MAXIMUM_DEGREE_VALUE || doubleAngle < 0 ) {
+       throw new IllegalArgumentException( " Invalid angle ");
      }
      return doubleAngle;
    }
@@ -101,10 +99,6 @@ public class Clock {
    public double validateTimeSliceArg( String argValue ) {
      double doubleArg = Double.parseDouble( argValue );
 
-     if( argValue.length() == 0 ) {
-        doubleArg = DEFAULT_TIME_SLICE_IN_SECONDS;
-        return DEFAULT_TIME_SLICE_IN_SECONDS;
-     }
      if( doubleArg < 0 ) {
         return INVALID_ARGUMENT_VALUE;
      }
@@ -129,7 +123,7 @@ public class Clock {
    */
    public double getMinuteHandAngle() {
       double angleChangeMin = (360.0 / 3600.0);
-      return angleChangeMin * totalSeconds;
+      return (double) Math.round( angleChangeMin * totalSeconds * 100 ) / 100 ;
    }
 
   /**
@@ -207,6 +201,8 @@ public class Clock {
       System.out.println( "  Creating a new clock: " );
       Clock clock0 = new Clock();
       System.out.println( "    New clock created: " + clock0.toString() );
+
+      /* Testing for validateTimeSliceArg() */
       System.out.println( "\n    Testing validateAngleArg()....");
       System.out.print( "      Sending '  0 degrees  ', expecting double value  0.0  " );
       try { System.out.println( (0.0 == clock0.validateAngleArg( "0.0" )) ? " - got 0.0" : " - no joy" ); }
@@ -216,26 +212,23 @@ public class Clock {
       try { System.out.println( (60.0 == clock0.validateAngleArg( "60.0" )) ? " - got 60.0" : " - no joy" ); }
       catch( Exception e ) { System.out.println ( " - Exception thrown: " + e.toString() ); }
 
-      System.out.print( "      Sending '  45 degrees  ', expecting double value  45.0  " );
-      try { System.out.println( (45.0 == clock0.validateAngleArg( "45.0" )) ? " - got 45.0" : " - no joy" ); }
+      System.out.print( "      Sending '  0.0065 degrees  ', expecting double value  0.0065  " );
+      try { System.out.println( (0.0065 == clock0.validateAngleArg( "0.0065" )) ? " - got 0.0065" : " - no joy" ); }
       catch( Exception e ) { System.out.println ( " - Exception thrown: " + e.toString() ); }
 
-      System.out.print( "      Sending '  180 degrees  ', expecting double value  180.0  " );
-      try { System.out.println( (180.0 == clock0.validateAngleArg( "180.0" )) ? " - got 180.0" : " - no joy" ); }
-      catch( Exception e ) { System.out.println ( " - Exception thrown: " + e.toString() ); }
+      System.out.print( "      Sending '  abc degrees  '   " );
+      try { System.out.println( (0.0 == clock0.validateAngleArg( "abc" )) ? " - got 0.0065" : " - no joy" ); }
+      catch( NumberFormatException nfe ) { System.out.println ( " - Exception thrown: " + nfe.toString() ); }
 
       System.out.print( "      Sending '  -55 degrees  ', expecting double value  -55.0  " );
       try { System.out.println( (-55.0 == clock0.validateAngleArg( "-55.0" )) ? " - got -55.0" : " - no joy" ); }
-      catch( Exception e ) { System.out.println ( " - Exception thrown: " + e.toString() ); }
-
-      System.out.print( "      Sending '  0.00065 degrees  ', expecting double value  0.00065  " );
-      try { System.out.println( (0.00065 == clock0.validateAngleArg( "0.00065" )) ? " - got 0.00065" : " - no joy" ); }
       catch( Exception e ) { System.out.println ( " - Exception thrown: " + e.toString() ); }
 
       System.out.print( "      Sending '  361 degrees  ', expecting double value  361.0  " );
       try { System.out.println( (361.0 == clock0.validateAngleArg( "361.0" )) ? " - got 361.0" : " - no joy" ); }
       catch( Exception e ) { System.out.println ( " - Exception thrown: " + e.toString() ); }
 
+      /* Testing for validateTimeSliceArg() */
       System.out.println( "\n\n    Testing validateTimeSliceArg()....");
       System.out.print( "      Sending '  18 seconds  ', expecting double value 18.0  " );
       try { System.out.println( (18.0 == clock0.validateTimeSliceArg( "18.0" )) ? " - got 18.0" : " - no joy" ); }
@@ -271,7 +264,7 @@ public class Clock {
       System.out.print( "      Testing getMinuteHandAngle()..... expecting 1.20" );
       System.out.println( ( 1.20 == clock2.getMinuteHandAngle() ? " - got 1.20" : " - no joy") );
       System.out.print( "      Testing getHandAngle()..... expecting 1.1 degrees" );
-      System.out.println( ( 1.1 == clock2.getHandAngle() ? " - got 5.5" : " - no joy") );
+      System.out.println( ( 1.1 == clock2.getHandAngle() ? " - got 1.1" : " - no joy") );
 
    }
 }
