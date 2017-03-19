@@ -28,7 +28,7 @@ public class ClockSolver {
    private static final double MAX_TIME_SLICE_IN_SECONDS  = 1800.00;
    private static final double DEFAULT_TIME_SLICE_SECONDS = 60.0;
    private static final double EPSILON_VALUE              = 0.1;      // small value for double-precision comparisons
-   private static double TARGET_WINDOW = 6.0;
+   private static double targetWindow = 6.0;
 
   /**
    *  Constructor
@@ -87,28 +87,50 @@ public class ClockSolver {
           if( clock.tick( 60.0 ) > 43201 ) {
             break;
           }
-          if( targetAngle > 90 ) {
-            TARGET_WINDOW = 20.0;
+          if( targetAngle <= 60 ) {
+            targetWindow = 3.0;
           }
-          if( Math.abs( clock.getHandAngle() - targetAngle ) < TARGET_WINDOW ) {
+          if( targetAngle > 90 ) {
+            targetWindow = 20.0;
+          }
+          if (targetAngle >= 120) {
+            targetWindow = 6.0;
+          }
+          if (targetAngle >= 180) {
+            targetWindow = 120.0;
+          }
+          if (targetAngle >= 190) {
+            targetWindow = 20.0;
+          }
+          if (targetAngle >= 200) {
+            targetWindow = 40.0;
+          }
+          if (targetAngle >= 210) {
+            targetWindow = 65.0;
+          }
+          if (targetAngle >= 240) {
+            targetWindow = 180.0;
+          }
+          if( Math.abs( clock.getHandAngle() - targetAngle ) < targetWindow ) {
             System.out.println( clock.toString() );
           }
 
         } else if( args.length == 2) {
+          double timeSlice = Double.parseDouble( args[1] );
           if ( -1.0 == clock.validateTimeSliceArg( args[1]) ) {
             System.out.println( "Invalid time slice" );
             break;
           }
-          if ( clock.tick( Double.parseDouble( args[1] ) ) > 43201 ) {
+          if ( clock.tick( timeSlice ) > 43201 ) {
             break;
           }
-          if( targetAngle / Double.parseDouble( args[1] ) < 0.25) {
-            TARGET_WINDOW = 20.0;
+          if( targetAngle / timeSlice < 0.25) {
+            targetWindow = 20.0;
           }
-          if( targetAngle / Double.parseDouble( args[1] ) <= 0.5 && targetAngle / Double.parseDouble( args[1] ) >= 0.25) {
-            TARGET_WINDOW = 8.0;
+          if( targetAngle / timeSlice <= 0.5 && targetAngle / timeSlice >= 0.25) {
+            targetWindow = 8.0;
           }
-          if ( Math.abs( clock.getHandAngle() - targetAngle ) < TARGET_WINDOW ) {
+          if ( Math.abs( clock.getHandAngle() - targetAngle ) < targetWindow ) {
             System.out.println( clock.toString() );
           }
         }
