@@ -36,9 +36,6 @@ public class Ball {
   private static final double MAXIMUM_DEGREE_VALUE = 360.0;
 
 
-  private int hour;
-  private int minute;
-  private double seconds;
   private double totalSeconds;
   private double xPosition;
   private double yPosition;
@@ -50,6 +47,8 @@ public class Ball {
   private double angleC;
   private double xAdd;
   private double yAdd;
+  private double xNew;
+  private double yNew;
 
   /**
    *    Constructor for ball
@@ -69,8 +68,8 @@ public class Ball {
    *    @param  timeSlice   Double from the main program arg input for each ball
    *    @return double-precision value of the current tick
    */
-  public double tick( double timeSlice ) {
-    totalSeconds += timeSlice;
+  public double tick() {
+    totalSeconds += 1;
     return totalSeconds;
   }
 
@@ -90,47 +89,66 @@ public class Ball {
 
   /**
    *   Method to calculate the next position of the ball
-   *
    *   @return double-precision value of the next position of the ball
    */
-  public double[] getPosition() {
+  public double[] newPosition() {
     double[] returnPosition = new double[2];
-    if( angle >= 0 && angle <= 90 ) {
+    if( angle >= 0 && angle <= 90 ) {                     // QUADRANT ONE
       angleB = angle - 0;
-    } else if( angle > 90 && angle <= 180 ){
+    } else if( angle > 90 && angle <= 180 ){              // QUADRANT TWO
       angleB = 180 - angle;
-    } else if( angle > 180 && angle <= 270 ){
+    } else if( angle > 180 && angle <= 270 ){             // QUADRANT THREE
       angleB = angle - 180;
-    } else if( angle > 270 && angle <= 360 ){
+    } else if( angle > 270 && angle <= 360 ){             // QUADRANT FOUR
       angleB = 360 - angle;
     }
 
+    // LAW OF SINES TO CALCULATE DELTA X AND DELTA Y
     angleC = 90;
     angleA = 180 - (angleC + angleB);
-    xAdd = (15 * Math.sin(angleB)) / Math.sin(angleC);
-    yAdd = (15 * Math.sin(angleA)) / Math.sin(angleC);
+    xAdd = (getSpeed() * Math.sin(angleB)) / Math.sin(angleC);
+    yAdd = (getSpeed() * Math.sin(angleA)) / Math.sin(angleC);
 
-    returnPosition[0] = xPosition + xAdd;
-    returnPosition[1] = yPosition + yAdd;
+    xNew = xPosition + xAdd;
+    yNew = yPosition + yAdd;
+    returnPosition[0] = xNew;
+    returnPosition[1] = yNew;
     return returnPosition;
   }
 
   /**
    *   Method to calculate the speed of the ball
-   *
    *   @return double-precision value of the speed of the ball after each tick
    */
   public double getSpeed() {
-    return 0.0;
+    double decrease = speed * .01;
+    speed = speed - decrease;
+    return speed;
   }
 
   /**
-   *  Method to return a String representation of this clock
-   *  @return String value of the current clock
+   *   Method to return a String representation of this position
+   *   @return String value of the current position
    */
-   public String toString() {
-      return 0.0;
+   public String ballToString() {
+      return "( " + xNew + ", " + yNew + ")";
    }
 
+   /**
+    *   Method to return a String representation of this clock
+    *   @return String value of the current position
+    */
+    public String timeToString() {
+      double hr = Math.floor( totalSeconds / 3600.0 );
+      double secondsLeft = totalSeconds % 3600;
+      double min = Math.floor( secondsLeft / 60.0 );
+      double secs = secondsLeft % 60;
+
+      String sHour = Integer.toString( (int)hr );
+      String sMinute = Integer.toString( (int)min );
+      String sSeconds = Double.toString( secs );
+
+      return sHour + ":" + sMinute + ":" + sSeconds;
+    }
 
 }
