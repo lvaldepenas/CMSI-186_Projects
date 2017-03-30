@@ -39,7 +39,7 @@ public class SoccerSim {
     balls = null;
   }
 
-  public void handleArguments( String args[] ) {
+  public void createBallArray( String args[] ) {
     // every group of 4 arguments will create a new ball
     // the very last argument can specify a time slice -- the main program will update the location of the balls every time slice
 
@@ -55,8 +55,8 @@ public class SoccerSim {
       numberBalls = Math.floor( args.length / 4 );
       balls = new Ball[(int)numberBalls];
       timer = new Timer();
-      System.out.println( "REPORT AT TIME  " + timer.toString() );
-      for( int i = 0; i < numberBalls; i += 4 ){
+      System.out.println( "INITIAL REPORT AT TIME  " + timer.toString() );
+      for( int i = 0; i < numberBalls; i += 4 ) {
         double xBall = Double.parseDouble( args[0 + i] );
         double yBall = Double.parseDouble( args[1 + i] );
         double dxBall = Double.parseDouble( args[2 + i] );
@@ -67,34 +67,35 @@ public class SoccerSim {
         System.out.println( "BALL " + i +  ":    position   " + balls[i].toString() +
                              "    velocity   " + balls[i].speedToString() );
       }
-
-      if( args.length % 4 == 1 ) {
-        int lastArg = args.length - 1;
-        timeSlice = Double.parseDouble(args[lastArg]);
-
-        System.exit( 1 );
-      } else if( args.length % 4 > 1 ) {
-        System.out.println( "   Error: incomplete number of args for last ball\n" +
-                              "   Please try again..........." );
-        System.exit( 1 );
-      } else if( args.length % 4 == 0 ) {
-        timeSlice = 0;
-      }
     }
   }
 
-  public void updateOutput() {
+  public int tickSet( String args[] ) {
+    if( args.length % 4 == 1 ) {
+      int lastArg = args.length - 1;
+      if( lastArg < 1 ) {
+        return Integer.parseInt(args[lastArg]);
+      } else {
+        return 1;
+        timeSlice = Double.parseDouble( args[lastArg] );
+      }
+
+      System.exit( 1 );
+    } else if( args.length % 4 > 1 ) {
+      System.out.println( "   Error: incomplete number of args for last ball\n" +
+                            "   Please try again..........." );
+      System.exit( 1 );
+    } else if( args.length % 4 == 0 ) {
+      return 1;
+      timeSlice = 1;
+    }
+  }
+
+  public void updateBalls() {
+    // this will output the position and velocity of each ball after every timeSlice
     for( int i = 0; i < numberBalls; i++) {
       balls[i].getPosition();
       balls[i].getSpeed();
-      double[] rest = new double[2];
-      rest[0] = 0.0;
-      rest[1] = 0.0;
-      if( balls[i].getSpeed() == rest ) {
-        velocityString = "AT REST";
-      } else {
-        velocityString = balls[i].speedToString();
-      }
       System.out.println( "BALL " + i +  ":    position   " + balls[i].toString() +
                            "    velocity   " + velocityString + "\n" );
     }
@@ -103,35 +104,22 @@ public class SoccerSim {
   public boolean collisionCheck() {
     // check to see if there is a collision by comparing distances between all balls
     // outputs if there is a collision detected or not
-    for( int i = 0; i < balls.length - 2; i++ ) {
-      for( int j = i + 1; j < balls.length - 1; j++) {
-        double[] distance1 = balls[i].getPosition();
-        double[] distance2 = balls[j].getPosition();
-        double xDistance = distance1[0] - distance2[0];
-        double yDistance = distance1[1] - distance2[1];
-        if( xDistance <= 8.9 || yDistance <= 8.9 ) {
-          return true;
-        }
-      }
-    }
-    return false;
+  }
+
+  public boolean poleCollision() {
+    // check to see if any of the balls collide with the pole
   }
 
   public static void main( String args[] ){
     SoccerSim ssm = new SoccerSim();
     Timer timer = new Timer();
-    ssm.handleArguments( args );
 
-    while( true ){
-      timer.tick();
-      System.out.println( "REPORT AT TIME " + timer.toString() );
-      ssm.updateOutput();
+    ssm.createBallArray( args ); // initial time report
 
-      if( ssm.collisionCheck() == true ) {
-        System.out.println( "COLLISION DETECTED" );
-      } else {
-        System.out.println( "NO COLLISION ");
-      }
+    while ( true ) {
+      timer.tick( ssm.tickSet( args ) );
+      System.out.print( "REPORT AT TIME " + timer.toString() );
+      ssm.updateBalls();
     }
 
   }
