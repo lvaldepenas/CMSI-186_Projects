@@ -10,7 +10,7 @@
  *                   public double validateAngleArg( String argValue )      // Validates angle input
  *                   public double validateTimeSliceArg( String argValue )  // Validates time slice input
  *                   public double getHourHandAngle()                // Calculates angle of hour hand at current time
- *                   public double getMinuteHandAngle()              // Calculates angle of minute hand at current time
+ *                   public double getminutehandangle()              // Calculates angle of minute hand at current time
  *                   public double getHandAngle()                    // Calculates angle between hour and minute hand
  *                   public double getTotalSeconds()                 // Returns current time in seconds
  *                   public String toString()                        // Returns current time in string format
@@ -24,6 +24,7 @@
  *            Rev      Date     Modified by:         Reason for change/modification
  *           -----  ----------  ------------         ------------------------------------------------------
  *  @version 1.0.0  2017-03-21  Laura Valdepenas     Initial writing and release
+*   @version 2.0.0  2017-03-27  Laura Valdepenas     Changed format from angle and speed to dx and dy
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 public class Ball {
@@ -31,124 +32,115 @@ public class Ball {
   /**
    *   Class field definitions
    */
-  private static final double BALL_RADIUS = 4.45;
+  private static final double BALL_RADIUS = 4.45; // inches
   private static final double BALL_WEIGHT = 1.0;
-  private static final double MAXIMUM_DEGREE_VALUE = 360.0;
 
-
+  private Timer timer;
   private double totalSeconds;
   private double xPosition;
   private double yPosition;
-  private double angle;
-  private double speed;
-
-  private double angleA;
-  private double angleB;
-  private double angleC;
-  private double xAdd;
-  private double yAdd;
-  private double xNew;
-  private double yNew;
+  private double dx;
+  private double dy;
+  private double[] returnPosition = new double[2];
+  private double[] speed = new double[2];
 
   /**
    *    Constructor for ball
    */
-  public Ball( double xPos, double yPos, double angleInput, double initialSpeed ) {
-    xPosition = xPos;
-    yPosition = yPos;
-    angle = angleInput;
-    speed = initialSpeed;
-    totalSeconds = 0;
+  public Ball( double inputOne, double inputTwo, double inputThree, double inputFour ) {
+    xPosition = inputOne;
+    yPosition = inputTwo;
+    dx = inputThree;
+    dy = inputFour;
   }
+
 
   /**
    *    Methods go here
    *
-   *    Method to calculate the next tick from the time increment
-   *    @param  timeSlice   Double from the main program arg input for each ball
-   *    @return double-precision value of the current tick
+   *
+   *   Method to calculate the speed of the ball
+   *   @return double-precision value of the speed of the ball after each tick
    */
-  public double tick() {
-    totalSeconds += 1;
-    return totalSeconds;
+  public double[] getSpeed() {
+    Timer timer = new Timer();
+    speed[0] = dx;
+    speed[1] = dy;
+    dx = dx - (.01 * dx);
+    dy = dy - (.01 * dy);
+    return speed;
   }
 
-  /**
-   *    Method to validate the angle argument
-   *    @param   argValue  String from the main programs args[0] input
-   *    @return  double-precision value of the argument
-   *    @throws  NumberFormatException
-   */
-  public double validateAngleArg( String argValue ) throws NumberFormatException, IllegalArgumentException {
-    double returnAngle = Double.parseDouble( argValue );
-    if( returnAngle > MAXIMUM_DEGREE_VALUE || returnAngle < 0 ) {
-      throw new IllegalArgumentException( " Invalid angle ");
-    }
-    return returnAngle;
-  }
 
   /**
    *   Method to calculate the next position of the ball
    *   @return double-precision value of the next position of the ball
    */
-  public double[] newPosition() {
-    double[] returnPosition = new double[2];
-    if( angle >= 0 && angle <= 90 ) {                     // QUADRANT ONE
-      angleB = angle - 0;
-    } else if( angle > 90 && angle <= 180 ){              // QUADRANT TWO
-      angleB = 180 - angle;
-    } else if( angle > 180 && angle <= 270 ){             // QUADRANT THREE
-      angleB = angle - 180;
-    } else if( angle > 270 && angle <= 360 ){             // QUADRANT FOUR
-      angleB = 360 - angle;
-    }
-
-    // LAW OF SINES TO CALCULATE DELTA X AND DELTA Y
-    angleC = 90;
-    angleA = 180 - (angleC + angleB);
-    xAdd = (getSpeed() * Math.sin(angleB)) / Math.sin(angleC);
-    yAdd = (getSpeed() * Math.sin(angleA)) / Math.sin(angleC);
-
-    xNew = xPosition + xAdd;
-    yNew = yPosition + yAdd;
-    returnPosition[0] = xNew;
-    returnPosition[1] = yNew;
+  public double[] getPosition() {
+    returnPosition[0] = xPosition + speed[0];
+    returnPosition[1] = yPosition + speed[1];
     return returnPosition;
   }
 
-  /**
-   *   Method to calculate the speed of the ball
-   *   @return double-precision value of the speed of the ball after each tick
-   */
-  public double getSpeed() {
-    double decrease = speed * .01;
-    speed = speed - decrease;
-    return speed;
-  }
 
   /**
    *   Method to return a String representation of this position
    *   @return String value of the current position
    */
-   public String ballToString() {
-      return "( " + xNew + ", " + yNew + ")";
-   }
+  public String toString() {
+    return "(" + returnPosition[0] + "," + returnPosition[1] + ")";
+  }
 
-   /**
-    *   Method to return a String representation of this clock
-    *   @return String value of the current position
-    */
-    public String timeToString() {
-      double hr = Math.floor( totalSeconds / 3600.0 );
-      double secondsLeft = totalSeconds % 3600;
-      double min = Math.floor( secondsLeft / 60.0 );
-      double secs = secondsLeft % 60;
+  /**
+   *   Method to return a String representation of this speed
+   *   @return String value of the current speed
+   */
+  public String speedToString() {
+    return "(" + speed[0] + "," + speed[1] + ")";
+  }
 
-      String sHour = Integer.toString( (int)hr );
-      String sMinute = Integer.toString( (int)min );
-      String sSeconds = Double.toString( secs );
 
-      return sHour + ":" + sMinute + ":" + sSeconds;
-    }
+  /**
+   *  The main program starts here
+   *
+   *  Test to check methods
+   */
+  public static void main( String args[] ) {
+    Timer timer1 = new Timer();
+    Timer timer2 = new Timer();
+
+    System.out.println( "\nBALL CLASS TESTER PROGRAM\n" +
+                           "--------------------------\n" );
+    System.out.println( " Creating a new ball at (25, 25) with (dx, dy) = (-1, -2) : " );
+    Ball ball = new Ball(25, 25, -1, -2);
+    System.out.println( "AT TIME    " + timer1.toString() );
+    ball.getPosition();
+    System.out.println( "POSITION: " + ball.toString() );
+    ball.getSpeed();
+    System.out.println( "SPEED:    " + ball.speedToString() );
+
+    timer1.tick();
+    System.out.println( "AT TIME    " + timer1.toString() );
+    ball.getPosition();
+    System.out.println( "POSITION: " + ball.toString() );
+    ball.getSpeed();
+    System.out.println( "SPEED:    " + ball.speedToString() );
+
+
+    System.out.println( "\n\n Creating a new ball at (300, -25) with (dx, dy) = (-2, 10) : " );
+    Ball ballTwo = new Ball(300, -25, -2, 10);
+    System.out.println( "AT TIME    " + timer2.toString() );
+    ballTwo.getPosition();
+    System.out.println( "POSITION: " + ballTwo.toString() );
+    ballTwo.getSpeed();
+    System.out.println( "SPEED:    " + ballTwo.speedToString() );
+
+    timer2.tick();
+    System.out.println( "AT TIME    " + timer2.toString() );
+    ballTwo.getPosition();
+    System.out.println( "POSITION: " + ballTwo.toString() );
+    ballTwo.getSpeed();
+    System.out.println( "SPEED:    " + ballTwo.speedToString() );
+  }
 
 }
