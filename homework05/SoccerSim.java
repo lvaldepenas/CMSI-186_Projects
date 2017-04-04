@@ -8,11 +8,11 @@
  *                   public void createBallArray( Strings args[] );    // Creates an array of soccer balls
  *                   public int tickSet( Strings args[] )        // Sets the tick value for the Timer.java file
  *                   public void updateBalls()                   // Updates and returns the position and velocity of each ball after each tick
+ *                   public void getBalls()                      // Gets the current position and velocity of each ball
  *                   public double[] collisionCheck()            // Determines if there is a collision between the balls in the ball array
- *                   public int collisionOne()                   // Pulls the first value from the collisionCheck return array
- *                   public int collisionTwo()                   // Pulls the second value from the collisionCehck return array
-                     public boolean restCheck()                  // Checks if all the balls in the ball array are at rest
+ *                   public boolean restCheck()                  // Checks if all the balls in the ball array are at rest
  *                   public boolean poleCollision()              // Detects any possible collision between the balls and the fixed pole
+ *                   public double determineTimeSlice()          // Determines the time slice from the argument line, if specified
  *                   public static void main( String args[] )    // Main method for testing functionality of methods
  *  Notes         :  None
  *  Warnings      :  None
@@ -24,7 +24,8 @@
  *           -----  ----------  ------------         ------------------------------------------------------
  *  @version 1.0.0  2017-03-23  Laura Valdepenas     Initial writing and release
  *  @version 2.0.0  2017-03-30  Laura Valdepenas     Updated methods
- *  @version 3.0.0  2017-03-31  Laura Valdepenas     Added new methods and modified previous
+ *  @version 3.0.0  2017-03-31  Laura Valdepenas     Added new methods, modified old ones
+ *  @version 4.0.0  2017-04-03  Laura Valdepenas     Added new methods, edited old ones, code finalized
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 public class SoccerSim {
@@ -37,7 +38,11 @@ public class SoccerSim {
   public double[] collision;
   public double xDistance;
   public double yDistance;
+  public double xDistanceBP;
+  public double yDistanceBP;
   public double distance;
+  public double distanceBP;
+
 
   public static final double X_POSITION_POLE = 25;
   public static final double Y_POSITION_POLE = -9;
@@ -79,29 +84,39 @@ public class SoccerSim {
         j++;
       }
     }
+
+    if( 4 <= args.length && args.length % 4 > 1 ) {
+      System.out.println( "   Incorrect number of arguments\n" +
+                            "   Please try again..........." );
+      System.exit( 1 );
+    }
   }
 
   public int tickSet( String args[] ) {
     if( args.length % 4 == 1 ) {
       int lastArg = args.length - 1;
-      if( lastArg < 1 ) {
+      if( Integer.parseInt( args[lastArg] ) < 1 ) {
         return Integer.parseInt( args[lastArg] );
-      } else {
-        return 1;
       }
-    } else if( args.length % 4 == 0 ) {
-      return 1;
     }
     return 1;
   }
 
   public void updateBalls() {
-    // this will output the position and velocity of each ball after every timeSlice
+    // this will update the position and velocity of each ball after every second
     for( int i = 0; i < numberBalls; i++) {
-      balls[i].getPosition();
-      balls[i].getSpeed();
-      System.out.println( "BALL " + i +  ":    position   " + balls[i].toString() +
-                           "    velocity   " + balls[i].speedToString() );
+      balls[i].updatePosition();
+      balls[i].updateSpeed();
+    }
+  }
+
+  public void getBalls() {
+    // this will return the position and velocity of each ball after every timeSlice
+    for( int i = 0; i < numberBalls; i++) {
+    balls[i].getPosition();
+    balls[i].getSpeed();
+    System.out.println( "BALL " + i +  ":    position   " + balls[i].toString() +
+                         "    velocity   " + balls[i].speedToString() );
     }
   }
 
@@ -122,18 +137,16 @@ public class SoccerSim {
       if( distance <= (8.90/12) ) {
         collision[0] = 0;
         collision[1] = 1;
-        return collision;
       }
     } else {
-      for( int i = 0; i < numberBalls - 2; i++ ) {
-        for( int j = i + 1; j < numberBalls - 1; j++) {
-          xDistance = balls[i].getPosition()[0] - balls[j].getPosition()[0];
-          yDistance = balls[i].getPosition()[1] - balls[j].getPosition()[1];
+      for( int i = 0; i <= numberBalls - 2; i++ ) {
+        for( int j = i + 1; j <= numberBalls - 1; j++) {
+          xDistance = balls[j].getPosition()[0] - balls[i].getPosition()[0];
+          yDistance = balls[j].getPosition()[1] - balls[i].getPosition()[1];
           distance = Math.sqrt(Math.pow((xDistance), 2) + Math.pow((yDistance), 2));
-          if( distance <= (8.90/12) ) {
-            collision[0] = i + 1;
-            collision[1] = j + 1;
-            return collision;
+          if( distance <= 8.9 ) {
+            collision[0] = i;
+            collision[1] = j;
           }
         }
       }
@@ -142,7 +155,7 @@ public class SoccerSim {
   }
 
   public boolean restCheck() {
-    restCheck = new boolean[balls.length];
+    restCheck = new boolean[(balls.length)];
     for( int i = 0; i < balls.length; i++ ) {
       restCheck[i] = balls[i].atRest();
     }
@@ -157,38 +170,52 @@ public class SoccerSim {
 
   public int poleCollision() {
     // check to see if any of the balls collide with the pole
-    for( int i = 0; i < balls.length; i++ ) {
-      double xDistanceBP = balls[i].getPosition()[0] - X_POSITION_POLE;
-      double yDistanceBP = balls[i].getPosition()[1] - Y_POSITION_POLE;
-      double distanceBP = Math.sqrt(Math.pow((xDistanceBP), 2) + Math.pow((yDistanceBP), 2));
-      if( distanceBP <= (4.45/12) ) {
+    for( int i = 0; i < numberBalls; i++ ) {
+      xDistanceBP = X_POSITION_POLE - balls[i].getPosition()[0];
+      yDistanceBP = Y_POSITION_POLE - balls[i].getPosition()[1];
+      distanceBP = Math.sqrt(Math.pow((xDistanceBP), 2) + Math.pow((yDistanceBP), 2));
+      if( distanceBP <= 4.45 ) {
         return i;
       }
     }
     return 0;
   }
 
+  public double determineTimeSlice( String args[] ) {
+    if( args.length % 4 == 1 ) {
+      timeSlice = Double.parseDouble( args[args.length - 1] );
+    } else if( args.length % 4 == 0 ) {
+      timeSlice = 1;
+    }
+    return timeSlice;
+  }
+
   public static void main( String args[] ){
     SoccerSim ssm = new SoccerSim();
     Timer timer = new Timer();
+
 
     ssm.createBallArray( args ); // initial report of position and velocity
 
     while ( ssm.restCheck() == false ) {
       timer.tick( ssm.tickSet( args ) );
-      System.out.println( "\nREPORT AT TIME " + timer.toString() );
-
       ssm.updateBalls();
-      ssm.collisionCheck();
-      
-      if( ssm.poleCollision() > 0) {
-        System.out.println( "\nCOLLISION DETECTED BETWEEN POLE AND BALL " + ssm.poleCollision() );
-        break;
-      } else if( ssm.collisionCheck()[0] >= 0 && ssm.collisionCheck()[1] > 0 ) {
-        int collisionBallOne = (int)ssm.collisionCheck()[0];
-        int collisionBallTwo = (int)ssm.collisionCheck()[1];
-        System.out.println( "\nCOLLISION DETECTED BETWEEN BALL " + collisionBallOne + " AND " + collisionBallTwo );
-        break;
+
+      if( timer.totalSeconds % ssm.determineTimeSlice( args ) == 0 ) {
+        System.out.println( "\nREPORT AT TIME " + timer.toString() );
+
+        ssm.getBalls();
+        ssm.collisionCheck();
+
+        if( ssm.poleCollision() > 0) {
+          System.out.println( "\nCOLLISION DETECTED BETWEEN POLE AND BALL " + ssm.poleCollision() );
+          break;
+        } else if( ssm.collisionCheck()[0] >= 0 && ssm.collisionCheck()[1] > 0 ) {
+          int collisionBallOne = (int)ssm.collisionCheck()[0];
+          int collisionBallTwo = (int)ssm.collisionCheck()[1];
+          System.out.println( "\nCOLLISION DETECTED BETWEEN BALL " + collisionBallOne + " AND " + collisionBallTwo );
+          break;
+        }
       }
     }
 
