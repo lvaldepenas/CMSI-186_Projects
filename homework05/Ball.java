@@ -2,12 +2,14 @@
  *  File name     :  Ball.java
  *  Purpose       :  Ball program for the SoccerSim class
  *  @author       :  Laura Valdepenas
- *  Date written  :  2017-3-21
+ *  Date written  :  2017-03-21
  *  Description   :  This class provides a bunch of methods which may be useful for the SoccerSim class
  *                   for Homework 5.  Includes the following:
  *                   public Ball()                  // Constructor for a ball
- *                   public double[] getSpeed()     // Calculates the next speed after every tick
- *                   public double[] getPosition()  // Calculates the position of the ball after every tick
+ *                   public double[] updatePosition()  // Calculates the position of the ball after every tick
+ *                   public double[] updateSpeed()     // Calculates the next speed after every tick
+ *                   public double[] getSpeed()     // Returns the current speed
+ *                   public double[] getPosition()  // Returns the current position
  *                   public double totalVelocity()  // Calculate the total velocity of the ball
  *                   public boolean atRest()        // Determine if the ball is at rest
  *                   public String toString()       // Returns the string format of the position
@@ -24,6 +26,8 @@
  *  @version 1.0.0  2017-03-21  Laura Valdepenas     Initial writing and release
  *  @version 2.0.0  2017-03-27  Laura Valdepenas     Changed format from angle and speed to coordinates dx and dy
  *  @version 3.0.0  2017-03-30  Laura Valdepenas     Removed methods relative to time, changed getSpeed method
+ *  @version 4.0.0  2017-04-03  Laura Valdepenas     Added new methods to check if at rest, separated update and get
+ *                                                        position and speed methods, finalized code
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 import java.text.DecimalFormat;
 
@@ -32,7 +36,7 @@ public class Ball {
   /**
    *   Class field definitions
    */
-   DecimalFormat df = new DecimalFormat("####.####");
+   DecimalFormat df = new DecimalFormat("###0.0000");
 
   private static final double BALL_RADIUS = 4.45; // inches
   private static final double BALL_WEIGHT = 1.0;
@@ -44,6 +48,8 @@ public class Ball {
   public double dy;
   public double[] returnPosition = new double[2];
   public double[] speed = new double[2];
+  public double[] getPosition = new double[2];
+  public double[] getSpeed = new double[2];
   public double totalVelocity;
 
   /**
@@ -57,30 +63,47 @@ public class Ball {
   }
 
   /**
+   *   Method to calculate the next position of the ball
+   *   @return double-precision value of the next position of the ball
+   */
+  public double[] updatePosition() {
+    returnPosition[0] = Double.parseDouble(df.format(xPosition + dx));
+    returnPosition[1] = Double.parseDouble(df.format(yPosition + dy));
+    if( atRest() == false ){
+      xPosition = xPosition + dx;
+      yPosition = yPosition + dy;
+    }
+    return returnPosition;
+  }
+
+  public double[] getPosition() {
+    getPosition[0] = Double.parseDouble(df.format(xPosition));
+    getPosition[1] = Double.parseDouble(df.format(yPosition));
+    return getPosition;
+
+  }
+
+  /**
    *    Methods go here
    *
    *
    *   Method to calculate the speed of the ball
    *   @return double-precision value of the speed of the ball after each tick
    */
-  public double[] getSpeed() {
+  public double[] updateSpeed() {
     speed[0] = Double.parseDouble(df.format(dx));
     speed[1] = Double.parseDouble(df.format(dy));
-    dx = dx - (.01 * dx);
-    dy = dy - (.01 * dy);
+    if( atRest() == false ){
+      dx = dx - (.01 * dx);
+      dy = dy - (.01 * dy);
+    }
     return speed;
   }
 
-  /**
-   *   Method to calculate the next position of the ball
-   *   @return double-precision value of the next position of the ball
-   */
-  public double[] getPosition() {
-    returnPosition[0] = Double.parseDouble(df.format(xPosition));
-    returnPosition[1] = Double.parseDouble(df.format(yPosition));
-    xPosition = xPosition + dx;
-    yPosition = yPosition + dy;
-    return returnPosition;
+  public double[] getSpeed() {
+    getSpeed[0] = Double.parseDouble(df.format(dx));
+    getSpeed[1] = Double.parseDouble(df.format(dy));
+    return getSpeed;
   }
 
   /**
@@ -108,7 +131,7 @@ public class Ball {
    *   @return String value of the current position
    */
   public String toString() {
-    return "(" + returnPosition[0] + "," + returnPosition[1] + ")";
+    return "(" + getPosition[0] + "," + getPosition[1] + ")";
   }
 
   /**
@@ -119,7 +142,7 @@ public class Ball {
     if( true == atRest() ) {
       return "AT REST";
     }
-    return "(" + speed[0] + "," + speed[1] + ")";
+    return "(" + getSpeed[0] + "," + getSpeed[1] + ")";
   }
 
   /**
@@ -143,6 +166,8 @@ public class Ball {
     while( timer1.totalSeconds < 5 ) {
     timer1.tick(1);
     System.out.println( "\nAT TIME    " + timer1.toString() );
+    ball.updatePosition();
+    ball.updateSpeed();
     ball.getPosition();
     ball.getSpeed();
     System.out.println( "POSITION: " + ball.toString() + "    SPEED:    " + ball.speedToString() );
@@ -160,6 +185,8 @@ public class Ball {
     while( timer2.totalSeconds < 5 ) {
     timer2.tick(1);
     System.out.println( "\nAT TIME    " + timer2.toString() );
+    ballTwo.updatePosition();
+    ballTwo.updateSpeed();
     ballTwo.getPosition();
     ballTwo.getSpeed();
     System.out.println( "POSITION: " + ballTwo.toString() + "    SPEED:    " + ballTwo.speedToString() );
