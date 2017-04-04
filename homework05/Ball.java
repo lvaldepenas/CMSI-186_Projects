@@ -1,48 +1,50 @@
 /** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *  File name     :  Ball.java
- *  Purpose       :  Provides a class defining methods for the ClockSolver class
+ *  Purpose       :  Ball program for the SoccerSim class
  *  @author       :  Laura Valdepenas
  *  Date written  :  2017-3-21
  *  Description   :  This class provides a bunch of methods which may be useful for the SoccerSim class
  *                   for Homework 5.  Includes the following:
- *                   public Clock()                                  // Constructor for a clock set at 0:0:0.0
- *                   public double tick( double timeSliceInput );    // Calculate next tick of clock with time slice
- *                   public double validateAngleArg( String argValue )      // Validates angle input
- *                   public double validateTimeSliceArg( String argValue )  // Validates time slice input
- *                   public double getHourHandAngle()                // Calculates angle of hour hand at current time
- *                   public double getminutehandangle()              // Calculates angle of minute hand at current time
- *                   public double getHandAngle()                    // Calculates angle between hour and minute hand
- *                   public double getTotalSeconds()                 // Returns current time in seconds
- *                   public String toString()                        // Returns current time in string format
- *                   public static void main( String args[] )        // Main method for testing functionality of methods
- *  Notes         :  None right now.  I'll add some as they occur.
+ *                   public Ball()                  // Constructor for a ball
+ *                   public double[] getSpeed()     // Calculates the next speed after every tick
+ *                   public double[] getPosition()  // Calculates the position of the ball after every tick
+ *                   public double totalVelocity()  // Calculate the total velocity of the ball
+ *                   public boolean atRest()        // Determine if the ball is at rest
+ *                   public String toString()       // Returns the string format of the position
+ *                   public String speedToString()        // Returns the string format of the velocity
+ *                   public static void main( String args[] )    // Main method for testing functionality of methods
+ *  Notes         :  None
  *  Warnings      :  None
- *  Exceptions    :  IllegalArgumentException when the input arguments are "hinky"
+ *  Exceptions    :  None
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Revision Histor
+ *  Revision History
  *  ---------------
  *            Rev      Date     Modified by:         Reason for change/modification
  *           -----  ----------  ------------         ------------------------------------------------------
  *  @version 1.0.0  2017-03-21  Laura Valdepenas     Initial writing and release
-*   @version 2.0.0  2017-03-27  Laura Valdepenas     Changed format from angle and speed to dx and dy
+ *  @version 2.0.0  2017-03-27  Laura Valdepenas     Changed format from angle and speed to coordinates dx and dy
+ *  @version 3.0.0  2017-03-30  Laura Valdepenas     Removed methods relative to time, changed getSpeed method
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+import java.text.DecimalFormat;
 
 public class Ball {
 
   /**
    *   Class field definitions
    */
+   DecimalFormat df = new DecimalFormat("####.####");
+
   private static final double BALL_RADIUS = 4.45; // inches
   private static final double BALL_WEIGHT = 1.0;
 
   private Timer timer;
-  private double totalSeconds;
-  private double xPosition;
-  private double yPosition;
-  private double dx;
-  private double dy;
-  private double[] returnPosition = new double[2];
-  private double[] speed = new double[2];
+  public double xPosition;
+  public double yPosition;
+  public double dx;
+  public double dy;
+  public double[] returnPosition = new double[2];
+  public double[] speed = new double[2];
+  public double totalVelocity;
 
   /**
    *    Constructor for ball
@@ -54,7 +56,6 @@ public class Ball {
     dy = inputFour;
   }
 
-
   /**
    *    Methods go here
    *
@@ -63,25 +64,44 @@ public class Ball {
    *   @return double-precision value of the speed of the ball after each tick
    */
   public double[] getSpeed() {
-    Timer timer = new Timer();
-    speed[0] = dx;
-    speed[1] = dy;
+    speed[0] = Double.parseDouble(df.format(dx));
+    speed[1] = Double.parseDouble(df.format(dy));
     dx = dx - (.01 * dx);
     dy = dy - (.01 * dy);
     return speed;
   }
-
 
   /**
    *   Method to calculate the next position of the ball
    *   @return double-precision value of the next position of the ball
    */
   public double[] getPosition() {
-    returnPosition[0] = xPosition + speed[0];
-    returnPosition[1] = yPosition + speed[1];
+    returnPosition[0] = Double.parseDouble(df.format(xPosition));
+    returnPosition[1] = Double.parseDouble(df.format(yPosition));
+    xPosition = xPosition + dx;
+    yPosition = yPosition + dy;
     return returnPosition;
   }
 
+  /**
+   *   Method to calculate the total velocity of the ball
+   *   @return double-precision value of the total velocity of the ball
+   */
+  public double totalVelocity() {
+    totalVelocity = Math.sqrt( dx * dx + dy * dy );
+    return totalVelocity;
+  }
+
+  /**
+   *   Method to determine if the ball is at rest
+   *   @return boolean value to tell if ball is at rest
+   */
+  public boolean atRest() {
+    if( totalVelocity() < 0.083333333 ) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    *   Method to return a String representation of this position
@@ -96,9 +116,11 @@ public class Ball {
    *   @return String value of the current speed
    */
   public String speedToString() {
+    if( true == atRest() ) {
+      return "AT REST";
+    }
     return "(" + speed[0] + "," + speed[1] + ")";
   }
-
 
   /**
    *  The main program starts here
@@ -115,32 +137,34 @@ public class Ball {
     Ball ball = new Ball(25, 25, -1, -2);
     System.out.println( "AT TIME    " + timer1.toString() );
     ball.getPosition();
-    System.out.println( "POSITION: " + ball.toString() );
     ball.getSpeed();
-    System.out.println( "SPEED:    " + ball.speedToString() );
+    System.out.println( "POSITION: " + ball.toString() + "    SPEED:    " + ball.speedToString() );
 
-    timer1.tick();
-    System.out.println( "AT TIME    " + timer1.toString() );
+    while( timer1.totalSeconds < 5 ) {
+    timer1.tick(1);
+    System.out.println( "\nAT TIME    " + timer1.toString() );
     ball.getPosition();
-    System.out.println( "POSITION: " + ball.toString() );
     ball.getSpeed();
-    System.out.println( "SPEED:    " + ball.speedToString() );
+    System.out.println( "POSITION: " + ball.toString() + "    SPEED:    " + ball.speedToString() );
+    }
+
 
 
     System.out.println( "\n\n Creating a new ball at (300, -25) with (dx, dy) = (-2, 10) : " );
     Ball ballTwo = new Ball(300, -25, -2, 10);
     System.out.println( "AT TIME    " + timer2.toString() );
     ballTwo.getPosition();
-    System.out.println( "POSITION: " + ballTwo.toString() );
     ballTwo.getSpeed();
-    System.out.println( "SPEED:    " + ballTwo.speedToString() );
+    System.out.println( "POSITION: " + ballTwo.toString() + "    SPEED:    " + ballTwo.speedToString() );
 
-    timer2.tick();
-    System.out.println( "AT TIME    " + timer2.toString() );
+    while( timer2.totalSeconds < 5 ) {
+    timer2.tick(1);
+    System.out.println( "\nAT TIME    " + timer2.toString() );
     ballTwo.getPosition();
-    System.out.println( "POSITION: " + ballTwo.toString() );
     ballTwo.getSpeed();
-    System.out.println( "SPEED:    " + ballTwo.speedToString() );
+    System.out.println( "POSITION: " + ballTwo.toString() + "    SPEED:    " + ballTwo.speedToString() );
+    }
   }
+
 
 }
