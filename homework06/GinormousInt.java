@@ -51,6 +51,7 @@ public class GinormousInt {
   public String digitsString;
   public int compareResult;
   public int inputLength;
+  public int length;
   public int[] result;
 
   public int j = 0;
@@ -233,7 +234,7 @@ public class GinormousInt {
     currentIntLength = toString().length();
     inputLength = value.toString().length();
 
-    int length = currentIntLength >= inputLength ? currentIntLength : inputLength;
+    length = currentIntLength >= inputLength ? currentIntLength : inputLength;
     int min = currentIntLength > inputLength ? inputLength : currentIntLength;
     result = new int[length+1];
 
@@ -306,6 +307,75 @@ public class GinormousInt {
   }
 
 /** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  *  Method to make the argument and current GinormousInt equal array sizes
+  *  @param  gint         GinormousInt to make equal
+  *  @return GinormousInt of equal array size and length
+  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  */
+  public GinormousInt equalArray( GinormousInt input ) {
+    inputLength = input.digits.length;
+    currentIntLength = negToPos().toString().length();
+    length = currentIntLength >= inputLength ? currentIntLength : inputLength;
+    int[] newArray = new int[length];
+    int max = 0;
+    int j = 0;
+
+    if( currentIntLength > inputLength ) {
+      max = length - inputLength;
+      for( int i = 0; i < max; i++ ) {
+        newArray[i] = 0;
+      }
+      for( int i = max; i < length; i++ ) {
+        newArray[i] = (int)input.digits[j];
+        j++;
+      }
+
+      if( input.signOfNumber == 1 ) {
+        return new GinormousInt( "-" + GinormousInt.toString(newArray) );
+      }
+    }
+
+    if( currentIntLength < inputLength ) {
+      max = length - currentIntLength;
+      for( int i = 0; i < max; i++ ) {
+        newArray[i] = 0;
+      }
+      for( int i = max; i < length; i++ ) {
+        newArray[i] = (int)this.digits[j];
+        j++;
+      }
+
+      if( this.signOfNumber == 1 ) {
+        return new GinormousInt( "-" + GinormousInt.toString(newArray) );
+      }
+    }
+
+    if( currentIntLength == inputLength ) {
+      if ( compareTo(input) == -1 ) {
+        for( int i = 0; i < digits.length; i++ ) {
+          newArray[i] = (int)digits[i];
+        }
+
+        if( this.signOfNumber == 1 ) {
+          return new GinormousInt( "-" + GinormousInt.toString(newArray) );
+        }
+      }
+
+      if( compareTo(input) == 1 ) {
+        for( int i = 0; i < digits.length; i++ ) {
+          newArray[i] = (int)input.digits[i];
+        }
+
+        if( signOfNumber == 1 ) {
+          return new GinormousInt( "-" + GinormousInt.toString(newArray) );
+        }
+      }
+    }
+
+    return new GinormousInt( GinormousInt.toString(newArray) );
+  }
+
+/** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *  Method to subtract the value of a GinormousIntk passed as argument to this GinormousInt using bytes
  *  @param  gint         GinormousInt to subtract from this
  *  @return GinormousInt that is the difference of the value of this GinormousInt and the one passed in
@@ -316,81 +386,90 @@ public class GinormousInt {
     int borrow;
     String differenceString;
     GinormousInt gi;
-    currentIntLength = toString().length();
-    inputLength = gint.toString().length();
+    boolean carry = false;
+    currentIntLength = digits.length;
+    inputLength = gint.digits.length;
 
-    int length;
-    int min;
 
     if( compareTo(gint) == 1 ) {
 
+      gint = equalArray(gint);
       length = currentIntLength;
-      min = inputLength;
       result = new int[length];
 
       if( signOfNumber == 0 && gint.signOfNumber == 0 || signOfNumber == 1 && gint.signOfNumber == 1 ) {
-        for( int i = 0; i < min; i++ ) {
-          if( Character.getNumericValue(reverser().toString().charAt(i)) >= Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i)) ) {
-            result[i] = Character.getNumericValue(reverser().toString().charAt(i)) - Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i));
-          } else if ( Character.getNumericValue(reverser().toString().charAt(i)) < Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i)) ) {
-            borrow = 10 + Character.getNumericValue(reverser().toString().charAt(i));
-            reverser().digits[i+1] = reverser().digits[i+1] - 1;
-            result[i] = Character.getNumericValue(reverser().toString().charAt(i)) - Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i));
+        for( int i = 0; i < length; i++ ) {
+          if( reverser().digits[i] >= GinormousInt.reverser(gint).digits[i] ) {
+            result[i] = reverser().digits[i] - GinormousInt.reverser(gint).digits[i];
           }
-        }
 
-        for( int i = min; i < length; i++ ) {
-            result[i] = Character.getNumericValue(reverser().toString().charAt(i));
+          if ( reverser().digits[i] < GinormousInt.reverser(gint).digits[i] ) {
+            carry = true;
+            result[i] = reverser().digits[i] - GinormousInt.reverser(gint).digits[i];
+          }
+
+          if( carry == true ) {
+            for( int j = i + 1; j < length; j++ ){
+              reverser().digits[j] -= 1;
+
+              if( reverser().digits[i] == 0 ) {
+                result[i] = result[i] + 10;
+              } else {
+                result[i] = 10 - Math.abs(result[i]) ;
+              }
+            }
+          }
         }
       }
 
       if( signOfNumber == 0 && gint.signOfNumber == 1 ) {
         GinormousInt sum = addInt(gint.negToPos());
         GinormousInt sumReversed = GinormousInt.reverser(sum);
-        for( int i = 0; i < min; i++ ) {
+        for( int i = 0; i < length; i++ ) {
           result[i] = Character.getNumericValue(sumReversed.toString().charAt(i));
-        }
-
-        for( int i = min; i < length; i++ ) {
-            result[i] = Character.getNumericValue(sumReversed.toString().charAt(i));
         }
       }
 
     } else if( compareTo(gint) == (-1) ) {
 
+      GinormousInt temp = equalArray(gint);
+
       length = inputLength;
-      min = currentIntLength;
       result = new int[length];
 
       if( signOfNumber == 0 && gint.signOfNumber == 0 ||  signOfNumber == 1 && gint.signOfNumber == 1) {
-        for( int i = 0; i < min; i++ ) {
-          if( Character.getNumericValue(reverser().toString().charAt(i)) <= Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i)) ) {
-            result[i] = Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i)) - Character.getNumericValue(reverser().toString().charAt(i));
-          } else if ( Character.getNumericValue(reverser().toString().charAt(i)) > Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i)) ) {
-            borrow = 10 + Character.getNumericValue(reverser().toString().charAt(i));
-            reverser().digits[i+1] = reverser().digits[i+1] - 1;
-            result[i] = Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i)) - Character.getNumericValue(reverser().toString().charAt(i));
+        for( int i = 0; i < length; i++ ) {
+          if( Character.getNumericValue(GinormousInt.reverser(temp).toString().charAt(i)) <= Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i)) ) {
+            result[i] = Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i)) - Character.getNumericValue(GinormousInt.reverser(temp).toString().charAt(i));
+          } else if ( Character.getNumericValue(GinormousInt.reverser(temp).toString().charAt(i)) > Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i)) ) {
+            carry = true;
           }
-        }
 
-        for( int i = min; i < length; i++ ) {
-          result[i] = Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i));
+          if( carry == true ) {
+            GinormousInt.reverser(gint).digits[i+1] = 4;
+            if( Character.getNumericValue(GinormousInt.reverser(temp).toString().charAt(i)) == 0 ) {
+              result[i] = 10 - Character.getNumericValue(GinormousInt.reverser(temp).toString().charAt(i));
+            } else if ( Character.getNumericValue(GinormousInt.reverser(temp).toString().charAt(i)) > 0 ) {
+              result[i] = 10 + Character.getNumericValue(GinormousInt.reverser(temp).toString().charAt(i)) - Character.getNumericValue(GinormousInt.reverser(gint).toString().charAt(i));
+            }
+          }
         }
       }
 
       if( signOfNumber == 1 && gint.signOfNumber == 0 ) {
         GinormousInt sum = addInt(gint.posToNeg());
         GinormousInt sumReversed = GinormousInt.reverser(sum);
-        for( int i = 0; i < min; i++ ) {
+        for( int i = 0; i < length; i++ ) {
           result[i] = Character.getNumericValue(sumReversed.toString().charAt(i));
         }
 
-        for( int i = min; i < length; i++ ) {
+        for( int i = length; i < length; i++ ) {
             result[i] = Character.getNumericValue(sumReversed.toString().charAt(i));
         }
       }
 
     } else if( compareTo(gint) == 0 ) {
+      gint = gint;
       result = new int[inputLength];
       for( int i = 0; i < inputLength; i++ ) {
         result[i] = 0;
@@ -413,6 +492,7 @@ public class GinormousInt {
     return gi;
   }
 
+
 /** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *  Method to multiply the value of a GinormousIntk passed as argument to this GinormousInt
  *  @param  gint         GinormousInt to multiply by this
@@ -420,17 +500,67 @@ public class GinormousInt {
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
   public GinormousInt multiply( GinormousInt gint ) {
-    throw new UnsupportedOperationException( "\n         Sorry, that operation is not yet implemented." );
+    Halver halver = new Halver();
+    String thisString = negToPos().toString();
+    int i = 0;
+    int n = 0;
+    GinormousInt result = ZERO;
+
+    System.out.println( "number1      number2         sum" );
+
+    while( thisString != "1" ) {
+      if( thisString.length() > 1 ) {
+        i = thisString.length() - 1;
+      } else {
+        i = 0;
+      }
+
+      n = Character.getNumericValue(thisString.charAt(i));
+
+      if( (n % 2) != 0 ) {
+        result = result.addInt(gint);
+      }
+
+      System.out.println( thisString + "            " + gint + "              " + result );
+
+      thisString = halver.halve(thisString);
+      gint = gint.addInt(gint);
+    }
+
+    return result;
+    ///// I am getting an error in the terminal window, but System.out.println() shows the Russian Peasant Multiplication method table ////
   }
 
 /** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Method to divide the value of this GinormousIntk by the GinormousInt passed as argument
+ *  Method to divide the value of this GinormousInt by the GinormousInt passed as argument
  *  @param  gint         GinormousInt to divide this by
  *  @return GinormousInt that is the dividend of this GinormousInt divided by the one passed in
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
   public GinormousInt divide( GinormousInt gint ) {
-    throw new UnsupportedOperationException( "\n         Sorry, that operation is not yet implemented." );
+    int count = 0;
+    GinormousInt difference = new GinormousInt(this.toString());
+    currentIntLength = toString().length();
+    inputLength = gint.toString().length();
+
+    if( compareTo(gint) == 0 ) {
+      return ONE;
+    } else if ( inputLength > currentIntLength ) {
+      return ZERO;
+    } else if ( gint == ZERO ) {
+      throw new NumberFormatException( "Cannot divide by zero");
+    } else if ( gint == ONE ) {
+      return difference;
+    } else {
+      while( Integer.parseInt(difference.toString()) > 0 ) {
+        difference = difference.subtractInt(gint);
+        count++;
+      }
+    }
+
+    String countString = Integer.toString(count);
+    return new GinormousInt( countString );
+
   }
 
 /** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
